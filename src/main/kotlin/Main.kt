@@ -1,4 +1,6 @@
 import com.microsoft.z3.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 const val alphabet = "abcdefghijklmnopqrstuvwxyz"
 val reverseAlphabet = alphabet.mapIndexed { index, c -> c to index }.toMap()
@@ -7,6 +9,12 @@ class WordleSolver {
     private val z3 = Context()
     private val solver = z3.mkSolver()
     private val letterVariables = (1..5).asSequence().map { z3.mkIntConst("letter_$it") }.toList()
+    private val solutionWords =
+        BufferedReader(InputStreamReader(javaClass.getResourceAsStream("/solution_words.txt"))).lineSequence()
+            .map { it.trim() }.filter { it.isNotEmpty() }.toList()
+    private val guessWords =
+        BufferedReader(InputStreamReader(javaClass.getResourceAsStream("/guess_words.txt"))).lineSequence()
+            .map { it.trim() }.filter { it.isNotEmpty() }.toList()
 
     fun solve(
         doesntContain: String = "",
@@ -16,7 +24,7 @@ class WordleSolver {
         correctPositions: String = ""
     ) {
         constrainToValidLetterIndexes()
-        constrainToValidWords(WORDS)
+        constrainToValidWords(solutionWords + guessWords)
 
         doesntContain.toCharArray().forEach { doesntContainLetter(it) }
         contains.toCharArray().forEach { containsLetter(it) }
@@ -116,10 +124,10 @@ class WordleSolver {
 
 fun main() {
     WordleSolver().solve(
-        "shvecirodm",
-        "agn",
-        "",
-        "a3a5a4g1",
-        "n3a2g4y5"
+        "raeodcghtbn",
+        "isk",
+        "s",
+        "i3s4",
+        "s1i2k4"
     )
 }
